@@ -1343,9 +1343,9 @@ describe('Queue', (it) => {
       return end;
     });
 
-    it('processes many fast jobs with one concurrent processor, count succeeded/failed Queue events', async (t) => {
-      const concurrency = 5;
-      const halfNumJobs = 100;
+    it('processes many fast, job-creating jobs with one concurrent processor, count succeeded/failed Queue events', async (t) => {
+      const concurrency = 3;
+      const halfNumJobs = 1000;
 
       const queue = t.context.makeQueue({
         activateDelayedJobs: true
@@ -1368,28 +1368,44 @@ describe('Queue', (it) => {
         t.truthy(job);
       });
 
-      let counter = 0;
+      const numJobs = halfNumJobs * 2;
+
+      let count = 0;
+      queue.createJob({count}).save();
+
+      // We creat jobs in process so to
       queue.process(concurrency, async (job) => {
         // t.true(queue.running <= concurrency);
-        t.is(job.data.count, counter);
-        ++counter;
-        if (counter % 2 === 0) throw new Error('fail odd job');
+        t.is(job.data.count, count);
+        ++count;
+
+        await helper.delay(0);
+        if (count < numJobs) {
+          queue.createJob({count}).save();
+        } else {
+          queue.createJob({count: numJobs, isFinalJob: true}).delayUntil(Date.now() + 20).save();
+        }
+        await helper.delay(0);
+
+        if (count % 2 === 0) throw new Error('fail odd job');
       });
 
-      const numJobs = halfNumJobs * 2;
+
+      /*
       for (let count = 0; count < numJobs; ++count) {
         await queue.createJob({count}).save();
       }
+      */
       // Delay the final, successful guard job so as to ensure a Queue 'succeeded' callback,
       // despite issue #78 -- this ensures that this test finishes
-      await queue.createJob({count: numJobs, isFinalJob: true}).delayUntil(Date.now() + 20).save();
+      //await queue.createJob({count: numJobs, isFinalJob: true}).delayUntil(Date.now() + 20).save();
 
       await finalEvent;
 
       t.is(failCount, halfNumJobs);
       // The + 1 are because the isFinalJob succeeds
       t.is(succeedCount, halfNumJobs + 1);
-      t.is(counter, numJobs + 1);
+      t.is(count, numJobs + 1);
     });
 
     it('processes many randomly offset jobs with one concurrent processor', async (t) => {
