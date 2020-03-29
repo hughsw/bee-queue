@@ -1556,6 +1556,7 @@ describe('Queue', (it) => {
       console.log('HSW checks');
 
       console.log('HSW counts:', JSON.stringify({
+        concurrency,
         numJobs,
         halfNumJobs,
         makeJobCount,
