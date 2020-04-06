@@ -91,7 +91,8 @@ function spitter() {
 }
 
 describe('Queue', (it) => {
-  const gclient = redis.createClient();
+  const redisHost = process.env.BEE_QUEUE_REDIS_HOST;
+  const gclient = redis.createClient({host: redisHost});
 
   it.before(() => gclient);
 
@@ -109,6 +110,16 @@ describe('Queue', (it) => {
     });
 
     function makeQueue(...args) {
+      if (redisHost) {
+        if (args.length === 0) {
+          args.push({});
+        }
+        if (!args[0].redis) {
+          // Note: we don't fuss with isClient(redis) because it's simpler to just
+          // add the host setting in the test code itself when redis is used
+          args[0].redis = {host: redisHost};
+        }
+      }
       const queue = new Queue(ctx.queueName, ...args);
       queue.on('error', (err) => ctx.queueErrors.push(err));
       ctx.queues.push(queue);
@@ -291,6 +302,7 @@ describe('Queue', (it) => {
           redis: {
             // Retry after 1 millisecond.
             retryStrategy: () => 1,
+            host: redisHost,
           },
         });
 
@@ -470,7 +482,7 @@ describe('Queue', (it) => {
       });
 
       it('should not quit the command client by default if given in settings', async (t) => {
-        const client = await redis.createClient();
+        const client = await redis.createClient({host: redisHost});
 
         sinon.spy(client, 'quit');
 
@@ -527,6 +539,7 @@ describe('Queue', (it) => {
         redis: {
           // Retry after 1 millisecond.
           retryStrategy: () => 1,
+          host: redisHost,
         },
       });
 
@@ -579,8 +592,9 @@ describe('Queue', (it) => {
 
       await queue.ready();
 
-      t.is(queue.client.connection_options.host, '127.0.0.1');
-      t.is(queue.bclient.connection_options.host, '127.0.0.1');
+      const host = redisHost || '127.0.0.1';
+      t.is(queue.client.connection_options.host, host);
+      t.is(queue.bclient.connection_options.host, host);
       t.is(queue.client.connection_options.port, 6379);
       t.is(queue.bclient.connection_options.port, 6379);
       t.true(queue.client.selected_db == null);
@@ -588,17 +602,18 @@ describe('Queue', (it) => {
     });
 
     it('creates a queue with passed redis settings', async (t) => {
+      const host = redisHost || 'localhost';
       const queue = t.context.makeQueue({
         redis: {
-          host: 'localhost',
+          host,
           db: 1,
         },
       });
 
       await queue.ready();
 
-      t.is(queue.client.connection_options.host, 'localhost');
-      t.is(queue.bclient.connection_options.host, 'localhost');
+      t.is(queue.client.connection_options.host, host);
+      t.is(queue.bclient.connection_options.host, host);
       t.is(queue.client.selected_db, 1);
       t.is(queue.bclient.selected_db, 1);
     });
@@ -610,12 +625,13 @@ describe('Queue', (it) => {
 
       await queue.ready();
 
-      t.is(queue.client.connection_options.host, '127.0.0.1');
+      const host = redisHost || '127.0.0.1';
+      t.is(queue.client.connection_options.host, host);
       t.is(queue.bclient, null);
     });
 
     it('should create a Queue with an existing redis instance', async (t) => {
-      const client = await redis.createClient();
+      const client = await redis.createClient({host: redisHost});
 
       const queue = t.context.makeQueue({
         redis: client,
@@ -633,7 +649,7 @@ describe('Queue', (it) => {
     });
 
     it('should create a Queue with a connecting redis instance', async (t) => {
-      const client = actualRedis.createClient();
+      const client = actualRedis.createClient({host: redisHost});
 
       const queue = t.context.makeQueue({
         redis: client,
