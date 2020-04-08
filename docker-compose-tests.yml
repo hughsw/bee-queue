@@ -3,7 +3,9 @@ version: '3.7'
 services:
 
   bee-queue:
-    image: bee-queue
+    build:
+      context: .
+      dockerfile: Dockerfile-tests
     environment:
     - BEE_QUEUE_REDIS_HOST=redis
 
