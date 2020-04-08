@@ -9,14 +9,9 @@ ARGS="$*"
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT="$(basename "${BASH_SOURCE[0]}")"
 
-imageTag=bee-queue
-
 cd $DIR
 
 set -x
-
-# Build the Docker image
-docker build --tag $imageTag --file Dockerfile-tests .
 
 # Establish a clean slate for Redis, see volumes in docker-compose.yml
 redisDataDir=./.redisData
@@ -25,6 +20,6 @@ rm -r $redisDataDir
 mkdir -p $redisDataDir
 
 # Run Redis and the tests
-docker-compose  --file docker-compose-tests.yml  up  --force-recreate  --remove-orphans  --abort-on-container-exit  --timeout 3
+docker-compose  --file docker-compose-tests.yml  up  --build  --force-recreate  --remove-orphans  --abort-on-container-exit  --timeout 3
 
 set +x

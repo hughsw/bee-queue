@@ -4,8 +4,9 @@ WORKDIR /bee-queue
 COPY package.json package-lock.json /bee-queue/
 RUN cd /bee-queue && npm --version && npm ci
 
-CMD npm run test
-COPY .eslintrc.json /bee-queue/
+#CMD npm run test
+CMD ./tests.sh
+COPY .eslintrc.json tests.sh /bee-queue/
 
 COPY test /bee-queue/test/
 COPY lib /bee-queue/lib/
