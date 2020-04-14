@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+
+  bee-queue:
+    build:
+      context: .
+      dockerfile: Dockerfile-tests
+    environment:
+    - BEE_QUEUE_REDIS_HOST=redis
+
+  redis:
+    image: redis:alpine
+    volumes:
+    - ./.redisData:/data
