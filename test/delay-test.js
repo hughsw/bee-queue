@@ -38,8 +38,8 @@ function reef(n = 1) {
 }
 
 describe('Delayed jobs', (it) => {
-  const redisHost = process.env.BEE_QUEUE_REDIS_HOST;
-  const gclient = redis.createClient({host: redisHost});
+  const redisUrl = process.env.BEE_QUEUE_TEST_REDIS;
+  const gclient = redis.createClient(redisUrl);
 
   it.before(() => gclient);
 
@@ -56,14 +56,14 @@ describe('Delayed jobs', (it) => {
     });
 
     function makeQueue(...args) {
-      if (redisHost) {
+      if (redisUrl) {
         if (args.length === 0) {
           args.push({});
         }
         if (!args[0].redis) {
           // Note: we don't fuss with isClient(redis) because it's simpler to just
           // add the host setting in the test code itself when redis is used
-          args[0].redis = {host: redisHost};
+          args[0].redis = redisUrl;
         }
       }
       const queue = new Queue(ctx.queueName, ...args);

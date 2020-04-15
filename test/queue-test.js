@@ -91,8 +91,9 @@ function spitter() {
 }
 
 describe('Queue', (it) => {
-  const redisHost = process.env.BEE_QUEUE_REDIS_HOST;
-  const gclient = redis.createClient({host: redisHost});
+  const redisUrl = process.env.BEE_QUEUE_TEST_REDIS;
+  const redisHost = redisUrl ? new URL(redisUrl).hostname : undefined;
+  const gclient = redis.createClient(redisUrl);
 
   it.before(() => gclient);
 
@@ -110,14 +111,14 @@ describe('Queue', (it) => {
     });
 
     function makeQueue(...args) {
-      if (redisHost) {
+      if (redisUrl) {
         if (args.length === 0) {
           args.push({});
         }
         if (!args[0].redis) {
           // Note: we don't fuss with isClient(redis) because it's simpler to just
           // add the host setting in the test code itself when redis is used
-          args[0].redis = {host: redisHost};
+          args[0].redis = redisUrl;
         }
       }
       const queue = new Queue(ctx.queueName, ...args);
@@ -302,7 +303,7 @@ describe('Queue', (it) => {
           redis: {
             // Retry after 1 millisecond.
             retryStrategy: () => 1,
-            host: redisHost,
+            url: redisUrl,
           },
         });
 
@@ -482,7 +483,7 @@ describe('Queue', (it) => {
       });
 
       it('should not quit the command client by default if given in settings', async (t) => {
-        const client = await redis.createClient({host: redisHost});
+        const client = await redis.createClient(redisUrl);
 
         sinon.spy(client, 'quit');
 
@@ -539,7 +540,7 @@ describe('Queue', (it) => {
         redis: {
           // Retry after 1 millisecond.
           retryStrategy: () => 1,
-          host: redisHost,
+          url: redisUrl,
         },
       });
 
@@ -631,7 +632,7 @@ describe('Queue', (it) => {
     });
 
     it('should create a Queue with an existing redis instance', async (t) => {
-      const client = await redis.createClient({host: redisHost});
+      const client = await redis.createClient(redisUrl);
 
       const queue = t.context.makeQueue({
         redis: client,
@@ -649,7 +650,7 @@ describe('Queue', (it) => {
     });
 
     it('should create a Queue with a connecting redis instance', async (t) => {
-      const client = actualRedis.createClient({host: redisHost});
+      const client = actualRedis.createClient(redisUrl);
 
       const queue = t.context.makeQueue({
         redis: client,
