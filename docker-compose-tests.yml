@@ -11,6 +11,6 @@ services:
 
   redis:
     image: redis:alpine
-    # wild escaping, just so we can echo something when the container starts up
-    command: /bin/sh -c echo\ starting\ Redis\ &&\ redis-server\ --tcp-backlog\ 128\ --logfile\ /dev/null
+    # wild escaping to get the shell to echo
+    command: /bin/sh -c set\ -x\ &&\ redis-server\ --tcp-backlog\ 128\ --logfile\ /dev/null
     #command: redis-server --tcp-backlog 128 --logfile /dev/null

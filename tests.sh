@@ -6,7 +6,7 @@ set -x
 
 npx ava --no-color --serial --timeout 30000 --verbose
 
-npm run eslint
+#npm run lint
 exit
 
 # The "official" test.  Fails when coveralls credentials aren't available
