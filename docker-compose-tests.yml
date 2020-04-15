@@ -7,9 +7,10 @@ services:
       context: .
       dockerfile: Dockerfile-tests
     environment:
-    - BEE_QUEUE_REDIS_HOST=redis
+    - BEE_QUEUE_TEST_REDIS=redis://redis
 
   redis:
     image: redis:alpine
-    volumes:
-    - ./.redisData:/data
+    # wild escaping, just so we can echo something when the container starts up
+    command: /bin/sh -c echo\ starting\ Redis\ &&\ redis-server\ --tcp-backlog\ 128\ --logfile\ /dev/null
+    #command: redis-server --tcp-backlog 128 --logfile /dev/null
