@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Build a Docker image and use it to run tests via docker-compose
-# See ./tests.sh for commands that get run
+# Build a Docker image and run tests in a container on a virtual network with an ephemeral Redis server container
+# See ./tests.sh for commands that get run in the container
 
 # Strict and loud failure
 set -euo pipefail
@@ -15,8 +15,8 @@ cd $DIR
 set -x
 
 # Run Redis and the tests
-docker-compose  --file docker-compose-tests.yml  down
-docker-compose  --file docker-compose-tests.yml  build  --quiet
-docker-compose  --file docker-compose-tests.yml  up  --force-recreate --renew-anon-volumes  --remove-orphans  --abort-on-container-exit  --timeout 3
+docker-compose --file docker-compose-tests.yml down || true
+docker-compose --file docker-compose-tests.yml build --quiet
+docker-compose --file docker-compose-tests.yml up --force-recreate --renew-anon-volumes --remove-orphans --abort-on-container-exit --timeout 3
 
 set +x

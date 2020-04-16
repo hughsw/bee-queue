@@ -59,7 +59,8 @@ describe('Delayed jobs', (it) => {
       if (redisUrl) {
         if (args.length === 0) {
           args.push({});
-        } else if (!args[0].redis) {
+        }
+        if (!args[0].redis) {
           // Note: we don't fuss with isClient(redis) because it's simpler to just
           // add the host setting in the test code itself when redis is used
           args[0].redis = redisUrl;
