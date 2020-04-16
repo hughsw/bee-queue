@@ -7,6 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile-tests
     environment:
+    # Url for the Redis server, must have schema
     - BEE_QUEUE_TEST_REDIS=redis://redis
 
   redis:

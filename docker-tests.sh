@@ -14,9 +14,10 @@ cd $DIR
 
 set -x
 
-# Run Redis and the tests
+# Housekeeping and build
 docker-compose --file docker-compose-tests.yml down || true
 docker-compose --file docker-compose-tests.yml build --quiet
+# Run Redis and the tests
 docker-compose --file docker-compose-tests.yml up --force-recreate --renew-anon-volumes --remove-orphans --abort-on-container-exit --timeout 3
 
 set +x

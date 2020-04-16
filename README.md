@@ -886,7 +886,7 @@ Some of these could be worthwhile additions; please comment if you're interested
 
 Running tests via `npm test` needs an non-password Redis server at port 127.0.0.1 to run the tests. Note that the testing will delete some Redis keys with the pattern `bq:test-*-*:*`.
 
-Alternatively, if you have Docker and docker-compose installed, you can build an image and run tests via `./docker-tests.sh`.  This approach will use a new ephemeral Redis server each time it is run.  Be patient as Docker populates caches the first time it is run and whenever package.json has been modified.  You can ignore Redis warnings about tcp backlog and Transparent Huge Page support.
+Alternatively, if you have Docker and docker-compose installed, you can build an image and run tests via `./docker-tests.sh`.  This approach uses an ephemeral Redis server each time it is run.  Be patient the first time you run it while Docker is downloading to populate its caches, and also each time package.json has been modified.  The `./tests.sh` script is what's run in the container.
 
 [npm-image]: https://img.shields.io/npm/v/bee-queue.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/bee-queue

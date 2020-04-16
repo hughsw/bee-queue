@@ -6,6 +6,7 @@ set -x
 
 npx ava --no-color --serial --timeout 30000 --verbose
 
+# Uncomment once linter issues are sorted out
 #npm run lint
 exit
 
