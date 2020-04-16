@@ -92,6 +92,7 @@ function spitter() {
 
 describe('Queue', (it) => {
   const redisUrl = process.env.BEE_QUEUE_TEST_REDIS;
+  // redisUrl must have a schema portion, e.g. redis://redis.example.com
   const redisHost = redisUrl ? new URL(redisUrl).hostname : undefined;
   const gclient = redis.createClient(redisUrl);
 
