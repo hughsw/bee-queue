@@ -16,7 +16,7 @@ set -x
 
 # Housekeeping and build
 docker-compose --file docker-compose-tests.yml down || true
-docker-compose --file docker-compose-tests.yml build --quiet
+docker-compose --file docker-compose-tests.yml build
 # Run Redis and the tests
 docker-compose --file docker-compose-tests.yml up --force-recreate --renew-anon-volumes --remove-orphans --abort-on-container-exit --timeout 3
 

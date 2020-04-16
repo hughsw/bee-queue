@@ -1,12 +1,13 @@
 FROM node:lts-alpine
 
 WORKDIR /bee-queue
-COPY package.json package-lock.json /bee-queue/
+
+COPY package.json package-lock.json ./
 # Installs per package-lock.json
-RUN cd /bee-queue && npm --version && npm ci
+RUN npm --version && npm ci
 
 CMD ./tests.sh
-COPY .eslintrc.json tests.sh /bee-queue/
+COPY .eslintrc.json tests.sh ./
 
-COPY test /bee-queue/test/
-COPY lib /bee-queue/lib/
+COPY test ./test/
+COPY lib ./lib/
